@@ -1,0 +1,4 @@
+interface:
+  display_name: "Reverse SSH Bridge"
+  short_description: "Run commands, open files and capture the screen on your Mac from a remote agent"
+  default_prompt: "Use $reverse-ssh-bridge to check that ssh mac works, then take a screenshot of my Mac."
