@@ -20,5 +20,6 @@
 | `launchctl asuser …: Operation not permitted` | 普通用户不能从 ssh 切换到 GUI 会话。改用 shotd 方案，不要尝试绕过。 |
 | `open -a` 没反应 | Mac 没有登录图形界面，或者 App 名字不对（用 `ls /Applications` 查）。 |
 | launchd 隧道起不来 | plist 里必须写绝对路径。查看 `/tmp/reversetunnel.err`。 |
+| 要停掉或卸载隧道 / Stop or remove the tunnel | 前台 `start-tunnel.sh`：Ctrl+C（停掉 autossh）。只停本次登录：`launchctl unload ~/Library/LaunchAgents/com.user.reversetunnel.plist`（plist 保留，下次登录会再起；只杀 autossh 没用，因为 `KeepAlive`）。彻底卸载：`install-launchagent.sh --uninstall`（`launchctl unload -w` 并删除该 plist）。不会停掉前台隧道。 |
 | 隧道频繁掉线 | 用 autossh 并设置 `ServerAliveInterval/CountMax`。Mac 睡眠时隧道一定会断，唤醒后 LaunchAgent 会自动重连。 |
 | 代理 / TUN 环境下直连失败 | Clash 等工具开了 TUN 模式时，所有出站流量都走 TUN，按网卡绑定直连通常会失败。把服务器地址加进代理的直连规则，或者保持经代理连接。 |

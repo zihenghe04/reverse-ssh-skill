@@ -57,13 +57,21 @@ Codex：
 
 为什么需要单独的截图服务？macOS 不允许 SSH 会话截屏，就算给 sshd 授予了屏幕录制权限，也会报 `could not create image from display`。从图形界面的终端里启动的进程则可以截屏。
 
+## 停止与卸载
+
+停掉隧道和卸掉 LaunchAgent 是两件事。下面的命令都在 Mac 上执行。
+
+- **前台隧道。** 在跑着 `scripts/local/start-tunnel.sh` 的那个终端按 Ctrl+C，会停掉 `autossh`。
+- **LaunchAgent，只停这一次登录。** `launchctl unload ~/Library/LaunchAgents/com.user.reversetunnel.plist` 会停掉 launchd 拉起的 `autossh`。plist 还在，下次登录会再启动。只杀掉 `autossh` 不够：plist 里开了 `KeepAlive`，launchd 会把它再拉起来。
+- **卸掉 LaunchAgent。** `scripts/local/install-launchagent.sh --uninstall` 会对同一份 plist 执行 `launchctl unload -w`（停掉 `autossh` 并禁用该任务），然后删除该文件。标签是 `com.user.reversetunnel`。这不会停掉前台的 `start-tunnel.sh`。
+
 ## 安全
 
 隧道等于把你 Mac 用户的 shell 交给了服务器，服务器上有 root 权限的人同样能用。建议：
 
 - 使用专用密钥，并在 `authorized_keys` 里加上 `from="127.0.0.1,::1"` 限制；
 - 转发只绑定回环地址；
-- 不用的时候关掉隧道。
+- 不用的时候停掉或卸载隧道（见「停止与卸载」）。
 
 截图可能拍到私人窗口，请存在私有目录里，不要提交到仓库。Skill 会要求 Agent 在你的 Mac 上执行破坏性或对外的操作之前先征得你的确认。
 

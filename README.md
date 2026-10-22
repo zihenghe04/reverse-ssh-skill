@@ -51,9 +51,17 @@ Use $reverse-ssh-bridge to set up the reverse tunnel between my Mac and this ser
 
 Why a capture daemon? macOS does not let an SSH session record the screen (`could not create image from display`), even if `sshd` is granted Screen Recording. A process started from a GUI terminal can.
 
+## Stop and uninstall
+
+Stopping a tunnel and removing its LaunchAgent are different. Run these on the Mac.
+
+- **Foreground tunnel.** In the terminal where `scripts/local/start-tunnel.sh` is running, press Ctrl+C. That stops `autossh`.
+- **LaunchAgent, this login only.** `launchctl unload ~/Library/LaunchAgents/com.user.reversetunnel.plist` stops the `autossh` job launchd started. The plist stays, so the tunnel starts again at the next login. Killing `autossh` is not enough: the plist sets `KeepAlive`, and launchd starts it again.
+- **Remove the LaunchAgent.** `scripts/local/install-launchagent.sh --uninstall` runs `launchctl unload -w` on that plist (stops `autossh` and disables the job) and deletes it. The label is `com.user.reversetunnel`. This does not stop a foreground `start-tunnel.sh`.
+
 ## Security
 
-The tunnel gives the server a shell as your Mac user, and anyone with root on the server can use it too. Use a dedicated key, restricted with `from="127.0.0.1,::1"` in `authorized_keys`. Keep the forward on loopback, and stop the tunnel when you don't need it. Screenshots can contain private windows: keep them in a private directory and never commit them. The skill tells the agent to confirm destructive or outward-facing actions on your Mac.
+The tunnel gives the server a shell as your Mac user, and anyone with root on the server can use it too. Use a dedicated key, restricted with `from="127.0.0.1,::1"` in `authorized_keys`. Keep the forward on loopback, and stop or remove the tunnel when you don't need it (see Stop and uninstall). Screenshots can contain private windows: keep them in a private directory and never commit them. The skill tells the agent to confirm destructive or outward-facing actions on your Mac.
 
 ## Development
 

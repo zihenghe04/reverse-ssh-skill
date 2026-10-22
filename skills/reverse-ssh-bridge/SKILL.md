@@ -55,4 +55,7 @@ Store captures, copied transcripts and other personal files in the user's chosen
 - Use a dedicated key with `IdentitiesOnly=yes`. Suggest `PasswordAuthentication no` and `AllowUsers <user>` on the Mac.
 - Follow the host's permission rules. Commands run on the user's real machine: confirm before destructive, outward-facing or hard-to-reverse actions, such as deleting files, replacing installed apps, `git push`, or publishing. Approval for one action does not carry over to another.
 - Do not try to bypass macOS privacy prompts (TCC). Ask the user to grant permissions in System Settings.
-- When finished, tell the user how to stop the tunnel (Ctrl+C, or `launchctl unload` for the LaunchAgent).
+- When finished, tell the user how to stop or remove the tunnel on the Mac. These are different:
+  - Foreground `scripts/local/start-tunnel.sh`: Ctrl+C in that terminal. That stops `autossh`.
+  - LaunchAgent, this login only: `launchctl unload ~/Library/LaunchAgents/com.user.reversetunnel.plist`. That stops the `autossh` job launchd started. The plist stays, so the tunnel starts again at the next login. Do not merely kill `autossh`: the plist sets `KeepAlive`, so launchd starts it again.
+  - Full removal: `scripts/local/install-launchagent.sh --uninstall`. That runs `launchctl unload -w` on the same plist (stops `autossh` and disables the job) and deletes it. The label is `com.user.reversetunnel`. This does not stop a foreground `start-tunnel.sh`.

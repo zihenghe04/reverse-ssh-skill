@@ -16,6 +16,8 @@ def install(target, destination=None):
     if output.exists():
         raise FileExistsError('Skill already installed; review it before replacing or updating')
     shutil.copytree(source, output, ignore=shutil.ignore_patterns('__pycache__', '*.pyc'))
+    # Git tracks the executable bit, but a GitHub zip archive does not.
+    # chmod keeps an install from an archive runnable.
     for script in (output / 'scripts').rglob('*.sh'):
         script.chmod(0o755)
     return output
