@@ -50,4 +50,7 @@ ssh 会话无法截屏，给 sshd 授予屏幕录制权限也没用。做法如�
 - 使用专用密钥，并设置 `IdentitiesOnly=yes`。建议在 Mac 上配置 `PasswordAuthentication no` 和 `AllowUsers <用户>`。
 - 遵守宿主环境的权限规则。所有命令都作用在用户的真实电脑上：删除文件、替换已安装的 App、`git push`、对外发布这类操作，先确认再执行。一次批准只对那一件事有效。
 - 不要绕过 macOS 的隐私授权（TCC），需要权限时请用户去系统设置里授予。
-- 用完告诉用户怎么关闭隧道：前台运行的按 Ctrl+C；用了 LaunchAgent 的执行 `install-launchagent.sh --uninstall`。
+- 用完告诉用户怎么停、怎么卸，这是两件事，都在 Mac 上做：
+  - 前台的 `scripts/local/start-tunnel.sh`：在那个终端按 Ctrl+C，会停掉 `autossh`。
+  - LaunchAgent 只停这一次登录：`launchctl unload ~/Library/LaunchAgents/com.user.reversetunnel.plist`。这会停掉 launchd 拉起的 `autossh`，plist 还在，下次登录会再启动。不要只杀掉 `autossh`：plist 里开了 `KeepAlive`，launchd 会把它再拉起来。
+  - 彻底卸载：`scripts/local/install-launchagent.sh --uninstall`。它会对同一份 plist 执行 `launchctl unload -w`（停掉 `autossh` 并禁用该任务），然后删除该文件。标签是 `com.user.reversetunnel`。这不会停掉前台的 `start-tunnel.sh`。
